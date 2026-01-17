@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Venv
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# Selenium 
+geckodriver.log
+*.log
+
+# Env
+.env
+.env.*
+
+# Datalake
+data/
+downloads/
+*.zip
+*.csv
+*.parquet
+*.json
+
+# Docker
+**/docker-data/
+*.pid
+
+# VSCode 
+.vscode/
+.idea/
+*.swp
+*.swo
+
+build/
+dist/
