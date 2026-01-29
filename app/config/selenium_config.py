@@ -4,6 +4,8 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
 
+from app.utils.download_manager import DownloadManager
+
 class SeleniumConfig:
 
     def __init__(
@@ -19,13 +21,7 @@ class SeleniumConfig:
         self.headless = headless
         self.mime_types = mime_types
 
-        self.datalake_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "..",
-            "data",
-        )
-        self.download_dir = os.path.join(self.datalake_dir, "raw")
-
+        self.download_dir = DownloadManager().get_download_dir()
         os.makedirs(self.download_dir, exist_ok=True)
 
     def _firefox_options(self) -> Options:
