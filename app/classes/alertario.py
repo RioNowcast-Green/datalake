@@ -153,7 +153,7 @@ class AlertaRio:
 
         df = pd.DataFrame(
             rows,
-            columns=["dia", "hora", "hbv", "15min", "1h", "4h", "24h", "96h"]
+            columns=["dia", "hora", "hbv", "station", "15min", "1h", "4h", "24h", "96h"]
         )
 
         return df

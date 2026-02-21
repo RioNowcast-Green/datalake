@@ -4,10 +4,16 @@ from app.classes.alertario import AlertaRio
 from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import insert
 
-if __name__ == "__main__":
-    alertario = AlertaRio()
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, EVENT_SCHEDULER_STARTED
 
-    year = "2015"
+from pytz import timezone
+
+from datetime import datetime
+
+
+def alertario(year):
+    alertario = AlertaRio()
 
     print("=== INICIANDO SCRAP ===")
     alertario.scrap_pluv(year)
@@ -31,8 +37,8 @@ if __name__ == "__main__":
             metadata,
             Column("dia", String, nullable=False),
             Column("hora", String, nullable=False),
-            Column("station", String, nullable=False),
             Column("hbv", String),
+            Column("station", String, nullable=False),
             Column("15min", String),
             Column("1h", String),
             Column("4h", String),
@@ -74,3 +80,47 @@ if __name__ == "__main__":
             print(f"  ✓ {inserted} linhas inseridas | {skipped} linhas duplicadas ignoradas")
 
     print("=== PROCESSO CONCLUÍDO ===")
+
+
+
+def job_listener(event):
+    global run_counter
+    run_counter += 1
+
+    job = scheduler.get_job("alertario_job")
+    next_run = job.next_run_time
+
+    print("\n==============================")
+    print(f"🔁 Run #{run_counter}")
+    print("🕒 Executado em:", datetime.now(tz))
+    print("⏭ Próxima execução:", next_run)
+    print("==============================\n")
+
+
+
+if __name__ == "__main__":
+
+    tz = timezone("America/Sao_Paulo")
+    td_year = datetime.now(tz).year
+
+    scheduler = BlockingScheduler(timezone=tz)
+
+    alertario(str(td_year))
+
+    scheduler.add_job(
+        alertario,
+        trigger="interval",
+        minutes=30,
+        args=[str(td_year)],
+        id="alertario_job",
+        max_instances=1,
+        coalesce=True
+    )
+
+    scheduler.add_listener(
+        job_listener,
+        EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+    )
+
+    print("🚀 Scheduler iniciado...")
+    scheduler.start()
