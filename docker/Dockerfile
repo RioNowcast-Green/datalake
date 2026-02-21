@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-binary :all: -r requirements.txt
 
 COPY . .
 
