@@ -1,11 +1,11 @@
 FROM python:3.11-slim
 
-# Evita prompts interativos
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV MOZ_HEADLESS=1
 
-# Dependências do Firefox + Selenium
+ENV GECKODRIVER_VERSION=0.34.0
+
 RUN apt-get update && apt-get install -y \
   firefox-esr \
   wget \
@@ -26,16 +26,18 @@ RUN apt-get update && apt-get install -y \
   libatk-bridge2.0-0 \
   libcups2 \
   fonts-liberation \
+  && wget -q https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz \
+  && tar -xzf geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz \
+  && mv geckodriver /usr/local/bin/ \
+  && chmod +x /usr/local/bin/geckodriver \
+  && rm geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Instalar dependências Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o projeto
 COPY . .
 
-# Comando padrão (PROD)
 CMD ["python", "main.py"]

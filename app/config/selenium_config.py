@@ -43,7 +43,7 @@ class SeleniumConfig:
 
         return options
 
-    def create_driver(self) -> webdriver.Firefox:
-        service = Service(GeckoDriverManager().install())
+    def create_driver(self):
+        service = Service("/usr/local/bin/geckodriver")
         options = self._firefox_options()
         return webdriver.Firefox(service=service, options=options)
