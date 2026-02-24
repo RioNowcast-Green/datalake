@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from app.classes.alertario import AlertaRio
-from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, PrimaryKeyConstraint
+from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, PrimaryKeyConstraint, text
 from sqlalchemy.dialects.postgresql import insert
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -25,6 +25,9 @@ def alertario(year):
         f"{os.getenv('POSTGRES_DB')}",
         pool_pre_ping=True
     )
+
+    with engine.begin() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS raw"))
 
     stations = alertario.get_stations()
     print(f"Estações disponíveis: {stations}")
@@ -80,8 +83,6 @@ def alertario(year):
             print(f"  ✓ {inserted} linhas inseridas | {skipped} linhas duplicadas ignoradas")
 
     print("=== PROCESSO CONCLUÍDO ===")
-
-
 
 def job_listener(event):
     global run_counter
